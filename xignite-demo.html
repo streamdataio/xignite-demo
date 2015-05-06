@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="">
+    <head>
+
+        <title>Streamdata.io | Xignite Demo</title>
+
+        <meta charset="utf-8">
+        <meta name="description" content="Xignite demo">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+
+        <link rel="shortcut icon" href="favicon.ico" />
+
+        <style type="text/css">
+            .container {
+                text-align: center;
+            }
+
+            img {
+                margin: 0 20px;
+                vertical-align: middle;
+            }
+
+            .result.eurusd,
+            .result.usdgbp,
+            .result.eurjpy,
+            .result.chfdkk
+            {
+                display: none;
+                font-size: 2em;
+            }
+
+            .result > p > span {
+                width: 160px;
+            }
+
+            .error {
+                display: none;
+                color: red;
+            }
+
+            .better {
+                color: green;
+            }
+
+            .worst {
+                color: red;
+            }
+
+        </style>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fast-json-patch/0.5.1/json-patch-duplex.min.js"></script>
+        <script src="streamdataio.min.js"></script>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+
+                var datasEURUSD;
+                var datasUSDGBP;
+                var datasEURJPY;
+                var datasCHFDKK;
+
+                // Your crendentials
+                streamdataio.Pk  = ""; // Streamdataio public key
+                streamdataio.pk  = ""; // Streamdataio private key
+                var xigniteToken = ""; // Xignite token
+
+                // Xignite API url
+                var urlEURUSD = "https://globalcurrencies.xignite.com/xGlobalCurrencies.json/GetRealTimeRate?Symbol=EURUSD&_token="+xigniteToken;
+                var urlUSDGBP = "https://globalcurrencies.xignite.com/xGlobalCurrencies.json/GetRealTimeRate?Symbol=USDGBP&_token="+xigniteToken;
+                var urlEURJPY = "https://globalcurrencies.xignite.com/xGlobalCurrencies.json/GetRealTimeRate?Symbol=EURJPY&_token="+xigniteToken;
+                var urlCHFDKK = "https://globalcurrencies.xignite.com/xGlobalCurrencies.json/GetRealTimeRate?Symbol=CHFDKK&_token="+xigniteToken;
+
+                // create the Streamdata sources
+                streamdataEURUSD = streamdataio.createEventSource(urlEURUSD);
+                streamdataUSDGBP = streamdataio.createEventSource(urlUSDGBP);
+                streamdataEURJPY = streamdataio.createEventSource(urlEURJPY);
+                streamdataCHFDKK = streamdataio.createEventSource(urlCHFDKK);
+
+                // EURUSD
+                streamdataEURUSD.onData(function(data) {
+                    datasEURUSD = data;
+                    $(".result.eurusd").show();
+                    renderCurrency($(".result.eurusd"), datasEURUSD);
+                });
+                streamdataEURUSD.onPatch(function(patch) {
+                    jsonpatch.apply(datasEURUSD, patch);
+                    renderCurrency($(".result.eurusd"), datasEURUSD);
+                });
+                streamdataEURUSD.onError(function(error) {
+                    console.error('Received an error: ' + error.message);
+                    $(".result.eurusd").hide();
+                    streamdataEURUSD.close();
+                    displayError(error.message);
+                });
+                streamdataEURUSD.open();
+
+                // USDGBP
+                streamdataUSDGBP.onData(function(data) {
+                    datasUSDGBP = data;
+                    $(".result.usdgbp").show();
+                    renderCurrency($(".result.usdgbp"), datasUSDGBP);
+                });
+                streamdataUSDGBP.onPatch(function(patch) {
+                    jsonpatch.apply(datasUSDGBP, patch);
+                    renderCurrency($(".result.usdgbp"), datasUSDGBP);
+                });
+                streamdataUSDGBP.onError(function(error) {
+                    console.error('Received an error: ' + error.message);
+                    $(".result.usdgbp").hide();
+                    streamdataUSDGBP.close();
+                    displayError(error.message);
+                });
+                streamdataUSDGBP.open();
+
+                // EURJPY
+                streamdataEURJPY.onData(function(data) {
+                    datasEURJPY = data;
+                    $(".result.eurjpy").show();
+                    renderCurrency($(".result.eurjpy"), datasEURJPY);
+                });
+                streamdataEURJPY.onPatch(function(patch) {
+                    console.log("Streamdataio onPatch");
+                    jsonpatch.apply(datasEURJPY, patch);
+                    renderCurrency($(".result.eurjpy"), datasEURJPY);
+                });
+                streamdataEURJPY.onError(function(error) {
+                    console.error('Received an error: ' + error.message);
+                    $(".result.eurjpy").hide();
+                    streamdataEURJPY.close();
+                    displayError(error.message);
+                });
+                streamdataEURJPY.open();
+
+                // CHFDKK
+                streamdataCHFDKK.onData(function(data) {
+                    datasCHFDKK = data;
+                    $(".result.chfdkk").show();
+                    renderCurrency($(".result.chfdkk"), datasCHFDKK);
+                });
+                streamdataCHFDKK.onPatch(function(patch) {
+                    jsonpatch.apply(datasCHFDKK, patch);
+                    renderCurrency($(".result.chfdkk"), datasCHFDKK);
+                });
+                streamdataCHFDKK.onError(function(error) {
+                    console.error('Received an error: ' + error.message);
+                    $(".result.chfdkk").hide();
+                    streamdataCHFDKK.close();
+                    displayError(error.message);
+                });
+                streamdataCHFDKK.open();
+
+                function renderCurrency(elem, datas) {
+                    var value = $("p > span", elem);
+                    var lastCurrency = value.html();
+                    value.removeClass( "better worst" );
+                    var valueClass = "";
+                    if (lastCurrency > datas.Mid) {
+                        valueClass = "worst";
+                    } else if(lastCurrency < datas.Mid) {
+                        valueClass = "better";
+                    }
+                    retour = "<p> 1 " + datas.BaseCurrency + " = <span class='" + valueClass + "'>"
+                            + datas.Mid + "</span> " + datas.QuoteCurrency + "</p>";
+                    elem.html(retour);
+                }
+
+                function displayError(msg) {
+                    $('.error').html(msg);
+                    $('.error').show();
+
+                    setTimeout(function() {
+                        $('.error').hide();
+                    }, 5000);
+                }
+
+            });
+
+        </script>
+
+    </head>
+    <body ng-app="app">
+        <!--[if lt IE 10]>
+        <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <div class="container">
+            <div class="header">
+                <img alt="logo.png"
+                     src="data:image/png;base64,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" />
+                    <img alt="http://www.xignite.com/img/global/logo-text.png"
+                         src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI4AAAAjCAMAAAB1ocIKAAAARVBMVEUAAAAjHyAjHyAjHyAjHyDnuR8jHyAjHyDnuR8jHyAjHyDnuR8jHyDnuR8jHyAjHyAjHyDnuR8jHyAjHyAjHyAjHyDnuR+lueQUAAAAFXRSTlMAECAwQEBQYGBwgICPj5+vv7/P3++1SX5hAAAChUlEQVRYhe2X25bbIAxFDXbjmlLMYOj/f2oBSVxsEl8myUzX6nmJDUjeICFI193XH9CPB0Mey4GGyw5eiNMPUeyb4OjPLtV/nPfpn8QRqNX75B9//opKQ9kUXFo9sbG0gefR7x1lfL+RnAzyMC7EAjgqNtEQPmnrwCk0TRhgCf0SX2/++QNyJ4FaR8InaIdnzefUO9YL4p8GVwvWiKuyDWZHTQEgmcWuGke5jUqcxRYdwyGcwdaNOobA4Jx8gWI4YO42ONJtVeJUMkdw1m0YIW4THNobtsHZ2j7Ccf0+Dk7dSl+qaa68ipCAXwvOKhxKjDn09aaFM4uUr25a4XTbnSXKb43F8qR0drVFgcOwS62jkHMnzowhj9jHsQVA14GdaaTpRAYFDi6gZXdxdDnnAzhD/TqXQymdiwWocfArc7eHczuKI1xL2MnTnjP5BrDFoWJ5H2d4Cg7lEpafN+CkotnCoRT0Kfmm1WnVsYSjcwvlR4UzVt98YrCKYGRVqOk03e4sx5+GgxPMGycrJU5NXJZBTHUTvDHROkJP4vDVx4JfFatQjz0Tlp9WVU6VadG5KJzCwQjEXOAs57LAZO2VjU7yuUnlp3Fm0WQqncKhnW2ENGGNskft70B6ISfIELYUrVPjRG/ViVM4fWk5bFMEnVAYYoTo9Grcdwoeu1zAKXcvZNC4uu8EJ8SIJxVFtHEb7LHPCnYJhxU8eBtc1UIrOg2SyQYUwvX7I6rLCn8j+3S+0yWrdNDDG1xPJbwk85uCeWi1viuHRtmsQQe0OlA/K+4nedZmcPMIc2KUReOOySsVk8L6pU+nm73+7/9JOJWuhvo1OHLf5n04y5euTUhglfekehXMX+yonYLkE1X+AAAAAElFTkSuQmCC" />
+
+            </div>
+
+                <div class="result eurusd"></div>
+                <div class="result usdgbp"></div>
+                <div class="result eurjpy"></div>
+                <div class="result chfdkk"></div>
+
+                <div class="error"></div>
+
+            <div class="footer">
+                <p>Brought to you by <a href="http://streamdata.io/" target="_blank">streamdata.io</a> team</p>
+            </div>
+        </div>
+
+    </body>
+</html>
