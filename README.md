@@ -16,5 +16,3 @@ See https://www.xignite.com/MyAccount/#/api/trials for more details.
 > - xigniteToken (Xignite Developer Token)
 
 4- Launch xignite-demo.html in your browser (either Chrome, Firefox or Safari but NOT IE yet!)
-
-Cordialement / Best Regards,
