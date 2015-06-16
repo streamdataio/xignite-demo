@@ -61,9 +61,8 @@
                 var datasCHFDKK;
 
                 // Your crendentials
-                streamdataio.Pk  = ""; // Streamdataio public key
-                streamdataio.pk  = ""; // Streamdataio private key
-                var xigniteToken = ""; // Xignite token
+                var streamdataioAppToken = "[YOUR_STREAMDATAIO_APP_TOKEN]";
+                var xigniteToken = "[YOUR_XIGNITE_TOKEN]";
 
                 // Xignite API url
                 var urlEURUSD = "https://globalcurrencies.xignite.com/xGlobalCurrencies.json/GetRealTimeRate?Symbol=EURUSD&_token="+xigniteToken;
@@ -72,10 +71,10 @@
                 var urlCHFDKK = "https://globalcurrencies.xignite.com/xGlobalCurrencies.json/GetRealTimeRate?Symbol=CHFDKK&_token="+xigniteToken;
 
                 // create the Streamdata sources
-                streamdataEURUSD = streamdataio.createEventSource(urlEURUSD);
-                streamdataUSDGBP = streamdataio.createEventSource(urlUSDGBP);
-                streamdataEURJPY = streamdataio.createEventSource(urlEURJPY);
-                streamdataCHFDKK = streamdataio.createEventSource(urlCHFDKK);
+                streamdataEURUSD = streamdataio.createEventSource(urlEURUSD, streamdataioAppToken);
+                streamdataUSDGBP = streamdataio.createEventSource(urlUSDGBP, streamdataioAppToken);
+                streamdataEURJPY = streamdataio.createEventSource(urlEURJPY, streamdataioAppToken);
+                streamdataCHFDKK = streamdataio.createEventSource(urlCHFDKK, streamdataioAppToken);
 
                 // EURUSD
                 streamdataEURUSD.onData(function(data) {
