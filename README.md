@@ -8,11 +8,8 @@ Using streamdataio with xignite Apis to get currencys change rate
 Our demo uses XigniteGlobalCurrencies API. If you are using a Xignite trial account, please make sure that you have set appropriate permission for this API and that maximum hits limit have not been reached.
 See https://www.xignite.com/MyAccount/#/api/trials for more details.
 
-2- Create an account on streamdata.io https://portal.streamdata.io/#/register to get your public and private keys.
+2- Create an free account on streamdata.io https://portal.streamdata.io/#/register to get an App token.
 
-3- Edit the xignite-demo.html and set following JavaScript variables accordingly:
-> - streamdataio.PK (streamdata.io Public Key)
-> - streamdataio.pK (streamdata.io Private Key)
-> - xigniteToken (Xignite Developer Token)
+3- Edit xignite-demo.html and replace [YOUR_XIGNITE_TOKEN], [YOUR_FLIGHTSTATS_APP_ID] with the appropriate keys.
 
-4- Launch xignite-demo.html in your browser (either Chrome, Firefox or Safari but NOT IE yet!)
+4- Launch xignite-demo.html in your browser (either Chrome, Firefox, Safari or IE).
